@@ -1,6 +1,10 @@
 twig:
-    file_name_pattern: '*.twig'
+  file_name_pattern: "*.twig"
 
-when@test:
-    twig:
-        strict_variables: true
+  #   # Configuration pour l'environnement de test
+  #   when@test:
+  #     strict_variables: true
+
+  # Thèmes de formulaire
+  form_themes:
+    - "bootstrap_5_layout.html.twig"
