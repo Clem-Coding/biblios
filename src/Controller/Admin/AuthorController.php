@@ -16,8 +16,7 @@ use App\Entity\Author;
 
 //utilise l'entité AuthorType qui correspond au formulaire associé
 use App\Form\AuthorType;
-
-
+use Doctrine\ORM\EntityManagerInterface;
 //Elle permet d'utiliser la classe AbstractController de Symfony dans votre fichier. AbstractController est une classe 
 //de base fournie par Symfony qui simplifie la création de contrôleurs. 
 //Elle contient des méthodes et fonctionnalités préconfigurées qu'on peut utiliser dans notre controller'.
@@ -79,7 +78,7 @@ class AuthorController extends AbstractController
 
 
     // Déclare la méthode new qui gère la création d'un nouvel auteur. Elle prend l'objet Request pour récupérer les données du formulaire.
-    public function new(Request $request): Response
+    public function new(Request $request, EntityManagerInterface $manager): Response
     {
 
         //Crée une nouvelle instance de l'entité Author pour représenter l'auteur qui sera ajouté.
@@ -95,7 +94,16 @@ class AuthorController extends AbstractController
         //Vérifie si le formulaire a été soumis et est valide.
         //méthodes isSubmitted() et isValid() appartiennent à Form
         if ($form->isSubmitted() && $form->isValid()) {
-            // faire quelque chose
+
+
+            // Les méthodes persist() et flush() viennent de l'instance du gestionnaire d'entités (EntityManager) de Doctrine, 
+            // Prépare l'objet $author pour être sauvegardé dans la base de données.
+            $manager->persist($author);
+
+            //$manager->flush(); : Effectue la sauvegarde réelle des objets persistés dans la base de données.
+            $manager->flush();
+
+            return $this->redirectToRoute(route: 'app_admin_author_index');
         }
         // Retourne la vue new.html.twig en passant l'objet $form pour l'affichage du formulaire.
         return $this->render('admin/author/new.html.twig', [
