@@ -16,7 +16,11 @@ use App\Entity\Author;
 
 //utilise l'entité AuthorType qui correspond au formulaire associé
 use App\Form\AuthorType;
+
+// Import de l'interface EntityManagerInterface de Doctrine pour gérer les entités et les opérations sur la base de données.
 use Doctrine\ORM\EntityManagerInterface;
+
+
 //Elle permet d'utiliser la classe AbstractController de Symfony dans votre fichier. AbstractController est une classe 
 //de base fournie par Symfony qui simplifie la création de contrôleurs. 
 //Elle contient des méthodes et fonctionnalités préconfigurées qu'on peut utiliser dans notre controller'.
