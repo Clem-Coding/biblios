@@ -11,6 +11,8 @@ use Symfony\Component\Validator\Constraints as Assert;
 
 
 #[ORM\Entity(repositoryClass: AuthorRepository::class)]
+//La ligne #[UniqueEntity(['name'])] est un attribut Symfony qui vérifie que la valeur du champ name dans l'entité Book 
+//est unique avant l'enregistrement dans la base de données. Si un doublon existe, une erreur de validation empêche l'enregistrement.
 #[UniqueEntity(['name'])]
 class Author
 {

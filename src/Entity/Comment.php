@@ -2,8 +2,8 @@
 
 namespace App\Entity;
 
-use App\Enum\CommentStatus;
 use App\Repository\CommentRepository;
+use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
 
 #[ORM\Entity(repositoryClass: CommentRepository::class)]
@@ -27,12 +27,13 @@ class Comment
     private ?\DateTimeImmutable $publishedAt = null;
 
     #[ORM\Column(length: 255)]
-    private ?CommentStatus $status = null;
+    private ?string $status = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(type: Types::TEXT)]
     private ?string $content = null;
 
-    #[ORM\ManyToOne]
+    #[ORM\ManyToOne(inversedBy: 'comments')]
+    #[ORM\JoinColumn(nullable: false)]
     private ?Book $book = null;
 
     public function getId(): ?int
@@ -88,12 +89,12 @@ class Comment
         return $this;
     }
 
-    public function getStatus(): ?CommentStatus
+    public function getStatus(): ?string
     {
         return $this->status;
     }
 
-    public function setStatus(CommentStatus $status): static
+    public function setStatus(string $status): static
     {
         $this->status = $status;
 

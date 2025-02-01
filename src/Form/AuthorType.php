@@ -11,7 +11,8 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\DateType;
-use Symfony\Component\Validator\Constraints\IsTrue;
+use Symfony\Component\Validator\Constraints as Assert;
+
 
 class AuthorType extends AbstractType
 {
@@ -45,17 +46,17 @@ class AuthorType extends AbstractType
                 'required' => false,
                 'label' => 'Livres',
             ])
-            ->add(
-                'certification',
-                CheckboxType::class,
-                [
-                    'mapped' => false, // Champ non mappé à l'entité
-                    'label' => "Je vérifie l'exactitude des informations fournies", // Label du champ
-                    // 'constraints' => [
-                    //     new Assert\IsTrue(message: "Vous devez cocher la case pour ajouter un livre."),
-                    // ]
-                ]
-            )
+            ->add('certification', CheckboxType::class, [
+                'mapped' => false,
+                'label' => "Je certifie l'exactitude des informations fournies",
+
+                //Fonctionne pas ci-après, à explorer....
+                // 'constraints' => [
+                //     new Assert\IsTrue([
+                //         'message' => "Vous devez cocher la case pour ajouter un livre."
+                //     ])
+                // ],
+            ])
 
 
         ;

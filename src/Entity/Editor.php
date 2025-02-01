@@ -6,8 +6,11 @@ use App\Repository\EditorRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 
 #[ORM\Entity(repositoryClass: EditorRepository::class)]
+#[UniqueEntity('name', message: 'Cet éditeur est déjà référencé dans la base de données')]
 class Editor
 {
     #[ORM\Id]
@@ -15,7 +18,13 @@ class Editor
     #[ORM\Column]
     private ?int $id = null;
 
+
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Le nom de l'éditeur ne peut pas être vide.")]
+    #[Assert\Length(
+        max: 255,
+        maxMessage: "Le nom de l'éditeur ne peut pas dépasser {{ limit }} caractères."
+    )]
     private ?string $name = null;
 
     /**
