@@ -54,6 +54,12 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
 
+
+// Importe la classe AuthorRepository pour accéder aux données des auteurs
+use App\Repository\AuthorRepository;
+use Pagerfanta\Doctrine\ORM\QueryAdapter;
+use Pagerfanta\Pagerfanta;
+
 //déclare une route pour le contrôleur AuthorController dans Symfony.
 //Cette route spécifie que les requêtes adressées à /admin/author (comme dans un navigateur ou via un appel API) seront gérées par cette classe.
 #[Route('/admin/author')]
@@ -62,8 +68,33 @@ class AuthorController extends AbstractController
 
     //déclare la route pour la méthode index() qui va render le template index.html.twig
     #[Route('', name: 'app_admin_author_index', methods: ['GET'])]
-    public function index(): Response
+    public function index(Request $request, AuthorRepository $repository): Response
     {
+
+        $dates = [];
+
+        if ($request->query->has('start')) {
+
+            $dates['start'] = $request->query->get('start');
+        }
+
+
+
+        if ($request->query->has('end')) {
+
+            $dates['end'] = $request->query->get('end');
+        }
+
+
+
+
+
+        $authors = Pagerfanta::createForCurrentPageWithMaxPerPage(
+            new QueryAdapter($repository->findByDateOfBirth()),
+            $request->query->get('page', default: 1),
+            maxPerPage: 10
+        );
+
         return $this->render('admin/author/index.html.twig', [
 
             //'controller_name' => 'AuthorController' : Ici, la clé 'controller_name' est associée à la valeur 'AuthorController'.
@@ -74,11 +105,14 @@ class AuthorController extends AbstractController
             //  Avoir un outil de débogage pour savoir quel contrôleur est responsable du rendu.
             //   Personnaliser le comportement ou l'affichage de la page selon le contrôleur actif.
             'controller_name' => 'AuthorController',
+            'authors' => $authors,
         ]);
     }
 
     //déclare la route pour la méthode new() en lui appliquant les méthodes GET et POST(il s'agit du template de formulaire)
     #[Route('/new', name: 'app_admin_author_new', methods: ['GET', 'POST'])]
+    #[Route('/{id}/edit', name: 'app_admin_author_edit', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
+
 
 
     // Déclare la méthode new qui gère la création d'un nouvel auteur. Elle prend l'objet Request pour récupérer les données du formulaire.
@@ -86,7 +120,7 @@ class AuthorController extends AbstractController
     {
 
         //Crée une nouvelle instance de l'entité Author pour représenter l'auteur qui sera ajouté.
-        $author = new Author();
+        $author ??= new Author();
 
         //Crée le formulaire à partir de la classe AuthorType et l'associe à l'objet $author (createForm() vient de l'AbstractController)
         $form = $this->createForm(AuthorType::class, $author);
@@ -110,8 +144,22 @@ class AuthorController extends AbstractController
             return $this->redirectToRoute(route: 'app_admin_author_index');
         }
         // Retourne la vue new.html.twig en passant l'objet $form pour l'affichage du formulaire.
-        return $this->render('admin/author/new.html.twig', [
-            'form' => $form,
+        return $this->redirectToRoute('app_admin_author_show', ['id' => $author->getId()]);
+    }
+
+
+    //ici on indique dans Route que le chemin contiendra l'id passsé en paramètre comme une variable
+    //le name:Nom de la route, utilisé pour les générateurs d'URL.
+    //requirements : on indique que le pramètre à passer en id doit être un ou plusieurs chiffres (cf regex)
+    //methods : GET parce qu'il s'agit uniquement de l'affichage
+    #[Route('/{id}', name: 'app_admin_author_show', requirements: ['id' => '\d+'], methods: ['GET'])]
+    public function show(?Author $author): Response
+    {
+
+        return $this->render('admin/author/show.html.twig', [
+
+            'author' => $author,
+
         ]);
     }
 }

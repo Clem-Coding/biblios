@@ -1,6 +1,7 @@
 {% extends 'base.html.twig' %}
 
-{% block title %}Hello EditorController!
+{% block title %}
+	Hello EditorController!
 {% endblock %}
 
 {% block body %}
@@ -9,11 +10,10 @@
 			<h1>Ajout d'un éditeur</h1>
 
 			{{ form_start(form) }}
-			{{ form_row(form.name, {label: 'Nom'}) }}
+			{{ form_row(form.name, { label: 'Nom' }) }}
 
 			<button type="submit" class="btn btn-primary">Envoyer</button>
 			{{ form_end(form) }}
 		</div>
 	</section>
-
 {% endblock %}
