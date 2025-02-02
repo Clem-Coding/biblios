@@ -5,6 +5,7 @@ namespace App\Repository;
 use App\Entity\Book;
 use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
 use Doctrine\Persistence\ManagerRegistry;
+use Doctrine\ORM\QueryBuilder;
 
 /**
  * @extends ServiceEntityRepository<Book>
@@ -40,4 +41,13 @@ class BookRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+
+
+    // Méthode pour récupérer les livres en fonction d'une plage de dates
+    // Méthode pour récupérer tous les livres triés par titre
+    public function findAllSortedByTitle(): QueryBuilder
+    {
+        return $this->createQueryBuilder('b')
+            ->orderBy('b.title', 'ASC');
+    }
 }

@@ -120,7 +120,7 @@ class AuthorController extends AbstractController
     {
 
         //Crée une nouvelle instance de l'entité Author pour représenter l'auteur qui sera ajouté.
-        $author ??= new Author();
+        $author = new Author();  // Crée un nouvel auteur
 
         //Crée le formulaire à partir de la classe AuthorType et l'associe à l'objet $author (createForm() vient de l'AbstractController)
         $form = $this->createForm(AuthorType::class, $author);
@@ -134,6 +134,9 @@ class AuthorController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
 
 
+
+
+
             // Les méthodes persist() et flush() viennent de l'instance du gestionnaire d'entités (EntityManager) de Doctrine, 
             // Prépare l'objet $author pour être sauvegardé dans la base de données.
             $manager->persist($author);
@@ -143,8 +146,9 @@ class AuthorController extends AbstractController
 
             return $this->redirectToRoute(route: 'app_admin_author_index');
         }
-        // Retourne la vue new.html.twig en passant l'objet $form pour l'affichage du formulaire.
-        return $this->redirectToRoute('app_admin_author_show', ['id' => $author->getId()]);
+        return $this->render('admin/author/new.html.twig', [
+            'form' => $form->createView(),  // Passe le formulaire à la vue
+        ]);
     }
 
 
@@ -160,6 +164,27 @@ class AuthorController extends AbstractController
 
             'author' => $author,
 
+        ]);
+    }
+
+
+    #[Route('/{id}/edit', name: 'app_admin_author_edit', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
+    public function edit(Author $author, Request $request, EntityManagerInterface $manager): Response
+    {
+        $form = $this->createForm(AuthorType::class, $author);  // Crée le formulaire avec les données existantes de l'auteur
+        $form->handleRequest($request);  // Traite la soumission du formulaire
+
+        if ($form->isSubmitted() && $form->isValid()) {
+            // Si le formulaire est soumis et valide, effectue la mise à jour de l'auteur
+            $manager->flush();
+
+            // Redirige vers la page d'affichage de l'auteur modifié
+            return $this->redirectToRoute('app_admin_author_show', ['id' => $author->getId()]);
+        }
+
+        return $this->render('admin/author/edit.html.twig', [
+            'form' => $form->createView(),  // Passe le formulaire à la vue
+            'author' => $author,  // Passe l'auteur à la vue pour l'édition
         ]);
     }
 }
