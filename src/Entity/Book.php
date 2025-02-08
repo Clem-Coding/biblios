@@ -8,11 +8,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: BookRepository::class)]
-#[UniqueEntity('title', message: 'Ce livre est déjà référencé dans la base de données')]
 class Book
 {
     #[ORM\Id]
@@ -20,45 +18,32 @@ class Book
     #[ORM\Column]
     private ?int $id = null;
 
-
-
-
     #[Assert\NotBlank()]
     #[ORM\Column(length: 255)]
     private ?string $title = null;
 
-
-    #[Assert\Regex(
-        pattern: '/^\d{13}$/',
-        message: 'Veuillez entrer un numéro ISBN valide à 13 chiffres.'
-    )]
+    #[Assert\Isbn(type: 'isbn13')]
+    #[Assert\NotBlank()]
     #[ORM\Column(length: 255)]
     private ?string $isbn = null;
 
-    #[Assert\Url(message: 'Veuillez entrer une URL valide.')]
+    #[Assert\NotBlank()]
+    #[Assert\Url()]
     #[ORM\Column(length: 255)]
     private ?string $cover = null;
 
-    #[ORM\Column]
     #[Assert\NotBlank()]
+    #[ORM\Column]
     private ?\DateTimeImmutable $editedAt = null;
 
-
-
-    #[Assert\Length(
-        min: 10,
-        max: 1000,
-        minMessage: 'Le synopsis doit comporter au moins {{ limit }} caractères.',
-        maxMessage: 'Le synopsis ne peut pas dépasser {{ limit }} caractères.'
-    )]
+    #[Assert\Length(min: 20)]
+    #[Assert\NotBlank()]
     #[ORM\Column(type: Types::TEXT)]
     private ?string $plot = null;
 
+    #[Assert\Type(type: 'integer')]
     #[ORM\Column]
-    #[Assert\Positive(message: 'Le nombre de pages doit être un nombre positif.')]
     private ?int $pageNumber = null;
-
-
 
     #[ORM\Column(length: 255)]
     private ?BookStatus $status = null;
@@ -70,8 +55,12 @@ class Book
     #[ORM\OneToMany(targetEntity: Comment::class, mappedBy: 'book', orphanRemoval: true)]
     private Collection $comments;
 
-    #[ORM\ManyToMany(targetEntity: Author::class, mappedBy: 'books')]
+    #[ORM\ManyToMany(targetEntity: Author::class, mappedBy: 'books', cascade: ['persist'])]
     private Collection $authors;
+
+    #[ORM\ManyToOne]
+    #[ORM\JoinColumn(nullable: false)]
+    private ?User $createdBy = null;
 
     public function __construct()
     {
@@ -233,6 +222,18 @@ class Book
         if ($this->authors->removeElement($author)) {
             $author->removeBook($this);
         }
+
+        return $this;
+    }
+
+    public function getCreatedBy(): ?User
+    {
+        return $this->createdBy;
+    }
+
+    public function setCreatedBy(?User $createdBy): static
+    {
+        $this->createdBy = $createdBy;
 
         return $this;
     }

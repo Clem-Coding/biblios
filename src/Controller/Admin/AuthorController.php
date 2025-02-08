@@ -59,13 +59,14 @@ use Symfony\Component\Routing\Attribute\Route;
 use App\Repository\AuthorRepository;
 use Pagerfanta\Doctrine\ORM\QueryAdapter;
 use Pagerfanta\Pagerfanta;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 //déclare une route pour le contrôleur AuthorController dans Symfony.
 //Cette route spécifie que les requêtes adressées à /admin/author (comme dans un navigateur ou via un appel API) seront gérées par cette classe.
 #[Route('/admin/author')]
 class AuthorController extends AbstractController
 {
-
+    #[IsGranted('IS_AUTHENTICATED')]
     //déclare la route pour la méthode index() qui va render le template index.html.twig
     #[Route('', name: 'app_admin_author_index', methods: ['GET'])]
     public function index(Request $request, AuthorRepository $repository): Response
@@ -109,6 +110,7 @@ class AuthorController extends AbstractController
         ]);
     }
 
+    #[IsGranted('ROLE_AJOUT_DE_LIVRE')]
     //déclare la route pour la méthode new() en lui appliquant les méthodes GET et POST(il s'agit du template de formulaire)
     #[Route('/new', name: 'app_admin_author_new', methods: ['GET', 'POST'])]
     #[Route('/{id}/edit', name: 'app_admin_author_edit', requirements: ['id' => '\d+'], methods: ['GET', 'POST'])]
@@ -116,9 +118,13 @@ class AuthorController extends AbstractController
 
 
     // Déclare la méthode new qui gère la création d'un nouvel auteur. Elle prend l'objet Request pour récupérer les données du formulaire.
-    public function new(Request $request, EntityManagerInterface $manager): Response
+    public function new(?Author $author, Request $request, EntityManagerInterface $manager): Response
     {
 
+
+        if ($author) {
+            $this->denyAccessUnlessGranted('ROLE_EDITION_DE_LIVRE');
+        }
         //Crée une nouvelle instance de l'entité Author pour représenter l'auteur qui sera ajouté.
         $author = new Author();  // Crée un nouvel auteur
 
