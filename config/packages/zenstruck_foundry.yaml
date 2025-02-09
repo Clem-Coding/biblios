@@ -1,0 +1,5 @@
+# config/packages/zenstruck_foundry.yaml
+zenstruck_foundry:
+  faker:
+    locale: fr_FR
+  # Toute autre configuration nécessaire
