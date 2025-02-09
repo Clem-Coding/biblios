@@ -56,3 +56,7 @@ when@test:
         cost: 4 # Lowest possible value for bcrypt
         time_cost: 3 # Lowest possible value for argon
         memory_cost: 10 # Lowest possible value for argon
+
+    # Ajout de l'écouteur pour l'événement 'security.interactive_login'
+    # event_listener:
+    #   security.interactive_login: '@App\EventListener\LastConnectionListener'

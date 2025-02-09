@@ -9,6 +9,6 @@ This is my first introduction to Symfony. I'm learning through the [OpenClassroo
 
 ## Biblios
 
-**Biblios** is a platform for browsing a municipal library's catalog, with an admin interface to manage books (add, edit, delete).
+**Biblios** is a fictive platform for browsing a municipal library's catalog, with an admin interface to manage books.
 
 ![capture d'écran du projet Biblios - section "Voir un livre"](assets/img/img-readme1.png)
